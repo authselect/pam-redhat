@@ -48,6 +48,8 @@
 
 #include "faillock.h"
 
+#define ignore_return(x) if (1==((int)x)) {;}
+
 int
 open_tally (const char *dir, const char *user, uid_t uid, int create)
 {
@@ -84,7 +86,7 @@ open_tally (const char *dir, const char *user, uid_t uid, int create)
 		while (flock(fd, LOCK_EX) == -1 && errno == EINTR);
 		if (fstat(fd, &st) == 0) {
 			if (st.st_uid != uid) {
-				fchown(fd, uid, -1);
+				ignore_return(fchown(fd, uid, -1));
 			}
 		}
 	}
