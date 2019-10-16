@@ -80,7 +80,7 @@
             </varlistentry>
             <varlistentry>
               <term>
-                <option>local_users_only/option>
+                <option>local_users_only</option>
               </term>
               <listitem>
                 <para>
