@@ -68,12 +68,12 @@
 #define FAILLOCK_FLAG_SILENT		0x4
 #define FAILLOCK_FLAG_NO_LOG_INFO	0x8
 #define FAILLOCK_FLAG_UNLOCKED		0x10
+#define FAILLOCK_FLAG_LOCAL_ONLY	0x20
 
 #define MAX_TIME_INTERVAL 604800 /* 7 days */
 #define FAILLOCK_CONF_MAX_LINELEN 1023
 #define FAILLOCK_ERROR_CONF_OPEN -3
 #define FAILLOCK_ERROR_CONF_MALFORMED -4
-#define DEFAULT_LOCAL_USERS_ONLY 0
 
 #define PATH_PASSWD "/etc/passwd"
 
@@ -89,7 +89,6 @@ struct options {
 	const char *user;
 	const char *admin_group;
 	int failures;
-	int local_users_only;
 	uint64_t latest_time;
 	uid_t uid;
 	int is_admin;
@@ -123,7 +122,6 @@ args_parse(pam_handle_t *pamh, int argc, const char **argv,
 	opts->fail_interval = 900;
 	opts->unlock_time = 600;
 	opts->root_unlock_time = MAX_TIME_INTERVAL+1;
-	opts->local_users_only = DEFAULT_LOCAL_USERS_ONLY;
 
 	if ((rv=read_config_file(pamh, opts, opts->conf)) != PAM_SUCCESS) {
 		pam_syslog(pamh, LOG_DEBUG,
@@ -317,7 +315,7 @@ void set_conf_opt(pam_handle_t *pamh, struct options *opts, const char *name, co
 		opts->flags |= FAILLOCK_FLAG_NO_LOG_INFO;
 	}
 	else if (strcmp(name, "local_users_only") == 0) {
-		opts->local_users_only = 1;
+		opts->flags |= FAILLOCK_FLAG_LOCAL_ONLY;
 	}
 	else {
 		pam_syslog(pamh, LOG_ERR, "Unknown option: %s", name);
@@ -664,7 +662,8 @@ pam_sm_authenticate(pam_handle_t *pamh, int flags,
 		return rv;
 	}
 
-	if (opts.local_users_only && check_local_user (pamh, opts.user) == 0) {
+	if ((opts.flags & FAILLOCK_FLAG_LOCAL_ONLY) &&
+		check_local_user (pamh, opts.user) == 0) {
 	/* skip the check if a non-local user */
 		rv = 0;
 	} else {
@@ -728,7 +727,8 @@ pam_sm_acct_mgmt(pam_handle_t *pamh, int flags,
 		return rv;
 	}
 
-	if (opts.local_users_only && check_local_user (pamh, opts.user) == 0) {
+	if ((opts.flags & FAILLOCK_FLAG_LOCAL_ONLY) &&
+		check_local_user (pamh, opts.user) == 0) {
 		/* skip the check if a non-local user */
 		rv = 0;
 	} else {
