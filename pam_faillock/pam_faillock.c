@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2010, 2017 Tomas Mraz <tmraz@redhat.com>
- * Copyright (c) 2010, 2017 Red Hat, Inc.
+ * Copyright (c) 2010, 2017, 2019 Tomas Mraz <tmraz@redhat.com>
+ * Copyright (c) 2010, 2017, 2019 Red Hat, Inc.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -84,15 +84,16 @@ struct options {
 	unsigned int fail_interval;
 	unsigned int unlock_time;
 	unsigned int root_unlock_time;
-	const char *dir;
+	char *dir;
 	const char *conf;
 	const char *user;
-	const char *admin_group;
+	char *admin_group;
 	int failures;
 	uint64_t latest_time;
 	uid_t uid;
 	int is_admin;
 	uint64_t now;
+	int fatal_error;
 };
 
 int read_config_file(
@@ -116,7 +117,7 @@ args_parse(pam_handle_t *pamh, int argc, const char **argv,
 	int rv;
 	memset(opts, 0, sizeof(*opts));
 
-	opts->dir = FAILLOCK_DEFAULT_TALLYDIR;
+	opts->dir = strdup(FAILLOCK_DEFAULT_TALLYDIR);
 	opts->conf = FAILLOCK_DEFAULT_CONF;
 	opts->deny = 3;
 	opts->fail_interval = 900;
@@ -161,6 +162,11 @@ args_parse(pam_handle_t *pamh, int argc, const char **argv,
 		opts->root_unlock_time = opts->unlock_time;
 	if (flags & PAM_SILENT)
 		opts->flags |= FAILLOCK_FLAG_SILENT;
+
+	if (opts->dir == NULL) {
+		pam_syslog(pamh, LOG_CRIT, "Error allocating memory: %m");
+		opts->fatal_error = 1;
+	}
 }
 
 /* parse a single configuration file */
@@ -251,7 +257,8 @@ void set_conf_opt(pam_handle_t *pamh, struct options *opts, const char *name, co
 			pam_syslog(pamh, LOG_ERR,
 				"Tally directory is not absolute path (%s); keeping default", value);
 		} else {
-			opts->dir = value;
+			free(opts->dir);
+			opts->dir = strdup(value);
 		}
 	}
 	else if (strcmp(name, "deny") == 0) {
@@ -300,7 +307,12 @@ void set_conf_opt(pam_handle_t *pamh, struct options *opts, const char *name, co
 		}
 	}
 	else if (strcmp(name, "admin_group") == 0) {
-		opts->admin_group = value;
+		free(opts->admin_group);
+		opts->admin_group = strdup(value);
+		if (opts->admin_group == NULL) {
+			opts->fatal_error = 1;
+			pam_syslog(pamh, LOG_CRIT, "Error allocating memory: %m");
+		}
 	}
 	else if (strcmp(name, "even_deny_root") == 0) {
 		opts->flags |= FAILLOCK_FLAG_DENY_ROOT;
@@ -642,6 +654,13 @@ tally_cleanup(struct tally_data *tallies, int fd)
 	free(tallies->records);
 }
 
+static void
+opts_cleanup(struct options *opts)
+{
+	free(opts->dir);
+	free(opts->admin_group);
+}
+
 /*---------------------------------------------------------------------*/
 
 PAM_EXTERN int
@@ -655,19 +674,19 @@ pam_sm_authenticate(pam_handle_t *pamh, int flags,
 	memset(&tallies, 0, sizeof(tallies));
 
 	args_parse(pamh, argc, argv, flags, &opts);
+	if (opts.fatal_error) {
+		rv = PAM_BUF_ERR;
+		goto err;
+	}
 
 	pam_fail_delay(pamh, 2000000);	/* 2 sec delay for on failure */
 
 	if ((rv=get_pam_user(pamh, &opts)) != PAM_SUCCESS) {
-		return rv;
+		goto err;
 	}
 
-	if ((opts.flags & FAILLOCK_FLAG_LOCAL_ONLY) &&
-		check_local_user (pamh, opts.user) == 0) {
-	/* skip the check if a non-local user */
-		rv = 0;
-	} else {
-
+	if (!(opts.flags & FAILLOCK_FLAG_LOCAL_ONLY) ||
+		check_local_user (pamh, opts.user) != 0) {
 		switch (opts.action) {
 			case FAILLOCK_ACTION_PREAUTH:
 				rv = check_tally(pamh, &opts, &tallies, &fd);
@@ -695,6 +714,9 @@ pam_sm_authenticate(pam_handle_t *pamh, int flags,
 
 	tally_cleanup(&tallies, fd);
 
+err:
+	opts_cleanup(&opts);
+
 	return rv;
 }
 
@@ -721,25 +743,29 @@ pam_sm_acct_mgmt(pam_handle_t *pamh, int flags,
 
 	args_parse(pamh, argc, argv, flags, &opts);
 
+	if (opts.fatal_error) {
+		rv = PAM_BUF_ERR;
+		goto err;
+	}
+
 	opts.action = FAILLOCK_ACTION_AUTHSUCC;
 
 	if ((rv=get_pam_user(pamh, &opts)) != PAM_SUCCESS) {
-		return rv;
+		goto err;
 	}
 
-	if ((opts.flags & FAILLOCK_FLAG_LOCAL_ONLY) &&
-		check_local_user (pamh, opts.user) == 0) {
-		/* skip the check if a non-local user */
-		rv = 0;
-	} else {
-
+	if (!(opts.flags & FAILLOCK_FLAG_LOCAL_ONLY) ||
+		check_local_user (pamh, opts.user) != 0) {
 		check_tally(pamh, &opts, &tallies, &fd); /* for auditing */
 		reset_tally(pamh, &opts, &fd);
 	}
 
 	tally_cleanup(&tallies, fd);
 
-	return PAM_SUCCESS;
+err:
+	opts_cleanup(&opts);
+
+	return rv;
 }
 
 /*-----------------------------------------------------------------------*/

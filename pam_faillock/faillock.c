@@ -57,7 +57,7 @@ open_tally (const char *dir, const char *user, uid_t uid, int create)
 	int flags = O_RDWR;
 	int fd;
 
-	if (strstr(user, "../") != NULL)
+	if (dir == NULL || strstr(user, "../") != NULL)
 	/* just a defensive programming as the user must be a
 	 * valid user on the system anyway
 	 */
