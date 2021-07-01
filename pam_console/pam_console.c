@@ -72,6 +72,7 @@ _pam_log(pam_handle_t *pamh, int err, int debug_p, const char *format, ...)
 
     va_start(args, format);
     pam_vsyslog(pamh, err, format, args);
+    va_end(args);
     closelog();
 }
 
@@ -152,8 +153,10 @@ try_xsocket(const char *path, size_t len) {
     memset(&addr, 0, sizeof(addr));
     addr.su.sun_family = AF_UNIX;
 
-    if (len > sizeof(addr.su.sun_path))
+    if (len > sizeof(addr.su.sun_path)) {
+        close(fd);
         return 0;
+    }
     memcpy(addr.su.sun_path, path, len);
     if (connect(fd, &addr.sa, sizeof(addr.su) - (sizeof(addr.su.sun_path) - len)) == 0) {
         close(fd);

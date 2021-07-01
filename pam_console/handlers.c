@@ -28,6 +28,7 @@
 #include <sys/types.h>
 #include <pwd.h>
 #include <syslog.h>
+#include <grp.h>
 
 #include "handlers.h"
 #include "pam_console.h"
@@ -145,6 +146,7 @@ console_parse_handlers (pam_handle_t *pamh, const char *handlers_name) {
 
 fail_exit:
         console_free_handlers(first_handler);
+        (void) fclose(fh);
         return rv;
 }
 

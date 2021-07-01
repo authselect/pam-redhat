@@ -235,6 +235,7 @@ chmod_files (const char *mode, uid_t user, gid_t group,
   }
 
   globfree(&result);
+  mode_free(changes);
 
   return (errors);
 }
