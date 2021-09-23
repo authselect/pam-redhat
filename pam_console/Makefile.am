@@ -44,6 +44,8 @@ secureconf_DATA = console.perms console.handlers
 FLEX_OPTS = -Cr
 BISON_OPTS = -d
 
+BUILT_SOURCES = configfile.tab.h configfile.tab.c configfile.lex.c
+
 pam_console_la_SOURCES = pam_console.c pam_console.h regerr.c handlers.c handlers.h
 pam_console_apply_SOURCES = pam_console_apply.c pam_console.h chmod.c modechange.c regerr.c \
 			 configfile.c configfile.h hashtable.c hashtable.h hashtable_private.h
@@ -51,15 +53,17 @@ pam_console_apply_SOURCES = pam_console_apply.c pam_console.h chmod.c modechange
 pam_console_la_CFLAGS = $(AM_CFLAGS)
 pam_console_apply_CFLAGS = $(AM_CFLAGS) @EXE_CFLAGS@
 
+configfile.tab.h: configfile.tab.c
+
 configfile.tab.c: configfile.y
 	$(YACC) $(BISON_OPTS) -o $@ -p _pc_yy $<
 	sh $(srcdir)/sed-static $@
 
-configfile.lex.c: configfile.l configfile.tab.c
+configfile.lex.c: configfile.l configfile.tab.h
 	$(LEX) $(FLEX_OPTS) -o$@ -P_pc_yy $<
 	sh $(srcdir)/sed-static $@
 
-configfile.c: configfile.tab.c configfile.lex.c
+configfile.c: configfile.tab.h configfile.tab.c configfile.lex.c
 
 install-data-local:
 	mkdir -p $(DESTDIR)$(secureconfdir)/console.apps
