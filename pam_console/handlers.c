@@ -39,18 +39,18 @@ enum flags { HF_LOGFAIL, HF_WAIT, HF_SETUID, HF_TTY, HF_USER, HF_PARAM };
 struct console_handler {
         char *executable;
         enum types type;
-        char *flags; /* this is a double zero terminated array 
+        char *flags; /* this is a double zero terminated array
                         allocated in one blob with executable */
         struct console_handler *next;
 };
 
 static struct console_handler *first_handler;
 
-static void 
+static void
 console_free_handlers (struct console_handler *handler) {
         if (handler != NULL) {
                 console_free_handlers(handler->next);
-                free(handler->executable);                
+                free(handler->executable);
                 free(handler);
         }
 }
@@ -63,15 +63,15 @@ console_parse_handlers (pam_handle_t *pamh, const char *handlers_name) {
         int skip = 0;
         int rv = PAM_SESSION_ERR;
         struct console_handler **previous_handler_ptr;
-        
+
         fh = fopen(handlers_name, "r");
         if (fh == NULL) {
                 _pam_log(pamh, LOG_ERR, FALSE, "cannot open file %s for reading", handlers_name);
                 return rv;
         }
-        
+
         previous_handler_ptr = &first_handler;
-        
+
         while (fgets(linebuf, sizeof(linebuf), fh) != NULL)
         {
                 int len;
@@ -81,7 +81,7 @@ console_parse_handlers (pam_handle_t *pamh, const char *handlers_name) {
                 char *destptr = NULL; /* needed to silence warning */
                 struct console_handler *handler;
                 enum states { EXECUTABLE, TYPE, FLAGS } state;
-                
+
                 len = strlen(linebuf);
                 if (linebuf[len-1] != '\n') {
                         _pam_log(pamh, LOG_INFO, FALSE, "line too long or not ending with new line char - will be ignored");
@@ -99,17 +99,17 @@ console_parse_handlers (pam_handle_t *pamh, const char *handlers_name) {
                 for (ptr = linebuf; isspace(*ptr); ptr++);
                 if (*ptr == '\0')
                         continue;
-                
+
                 /* something on the line */
                 if ((handler=calloc(sizeof(*handler), 1)) == NULL)
                         goto fail_exit;
                 *previous_handler_ptr = handler;
                 previous_handler_ptr = &handler->next;
-                                                                                                                                                        
+
                 if ((handler->executable=malloc(len-(ptr-linebuf)+1)) == NULL) {
                         goto fail_exit;
                 }
-                
+
                 state = EXECUTABLE;
                 handler->type = UNKNOWN;
                 while ((tokptr=strtok_r(ptr, " \t", &temp)) != NULL) {
@@ -121,7 +121,7 @@ console_parse_handlers (pam_handle_t *pamh, const char *handlers_name) {
                         else if (state == TYPE) {
                                 if (strcmp(tokptr, "lock") == 0) {
                                         handler->type = LOCK;
-                                } 
+                                }
                                 else if (strcmp(tokptr, "unlock") == 0) {
                                         handler->type = UNLOCK;
                                 }
@@ -129,7 +129,7 @@ console_parse_handlers (pam_handle_t *pamh, const char *handlers_name) {
                                         handler->type = CONSOLEDEVS;
                                 }
                         }
-                        
+
                         if (state == FLAGS) {
                                 strcpy(destptr, tokptr);
                                 destptr += strlen(destptr) + 1;
@@ -138,11 +138,11 @@ console_parse_handlers (pam_handle_t *pamh, const char *handlers_name) {
                                 state++;
                         }
                 }
-                *destptr = '\0';                
+                *destptr = '\0';
         }
         forget = fclose(fh);
 
-        return PAM_SUCCESS;        
+        return PAM_SUCCESS;
 
 fail_exit:
         console_free_handlers(first_handler);
@@ -285,7 +285,7 @@ execute_handler(pam_handle_t *pamh, struct console_handler *handler, const char 
 	else if (WIFSIGNALED(rv))
 		_pam_log(pamh, LOG_ERR, !logfail, "handler '%s' caught a signal %d",
 			handler->executable, (int)WTERMSIG(rv));
-			
+
         return 0;
 }
 

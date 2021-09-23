@@ -28,11 +28,11 @@ g_slist_append(GSList *l, void *d)
 	memb = _do_malloc(sizeof(*memb));
 	memb->next = NULL;
 	memb->data = d;
-	
+
 	if (l == NULL) {
 		return memb;
 	}
-	
+
 	n = l;
 	while (n->next != NULL) {
 		n = n->next;

@@ -41,10 +41,10 @@ str_hash(unsigned char *s)
 {
         unsigned int hash = 5381;
 	int c;
-	                
+
 	while ((c = *s++))
 		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
-	                                    
+
 	return hash;
 }
 
@@ -90,7 +90,7 @@ classdef:
 		  class *c;
 
 		  c = hashtable_search(namespace, $2);
-		  if (c) { 
+		  if (c) {
 			empty_class(c);
 		  } else {
 			c = malloc(sizeof(class));

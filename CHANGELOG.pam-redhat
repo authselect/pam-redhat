@@ -42,7 +42,7 @@ without autoconf support.
 * pam_console: allow printing to multifunction devices
 
 0.99.8-1: Mon Jul 23 2007
-* pam_console: decrement console use count properly - CVE-2007-1716 
+* pam_console: decrement console use count properly - CVE-2007-1716
 * pam_console: add more displays to console class
 * pam_console: add some firewire devices to default.perms (#240770)
 
@@ -92,7 +92,7 @@ without autoconf support.
 
 0.99.2-1: Tue Jan 03 2006
 
-* pam_console: fixed uninitialized value on broken config file 
+* pam_console: fixed uninitialized value on broken config file
   (#141053, patch by Jay Fenlason)
 * pam_console: man page fixes.
 * pam_loginuid: added option require_auditd to require auditd running (Steve Grubb).
@@ -144,8 +144,8 @@ without autoconf support.
 * pam_console: Don't check the ownership of terminal on logout - we don't
   have it on X crash (tmraz)
 * pam_stack: Fix memory leaks (tmraz)
-* pam_timestamp: Ignore the timestamp file if it's older than oldest 
+* pam_timestamp: Ignore the timestamp file if it's older than oldest
   login (tmraz)
 * Allow using pam_console for authentication (tmraz)
-* Add a file parameter to pam_console_apply to apply its work only on 
+* Add a file parameter to pam_console_apply to apply its work only on
   that file (tmraz)

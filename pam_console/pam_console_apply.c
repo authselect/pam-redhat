@@ -107,10 +107,10 @@ main(int argc, char **argv)
 			case 'r':
 				  sense = Reset;
 				  break;
-			case 's': 
+			case 's':
 				  syslogging = TRUE;
 				  break;
-			case 'd': 
+			case 'd':
 				  debug = TRUE;
 				  break;
 			default:
@@ -132,7 +132,7 @@ main(int argc, char **argv)
 		parse_files();
 	else
 		parse_file(consoleperms);
-		
+
         if (sense != Reset && (fd=open(consolelock, O_RDONLY)) != -1) {
 		if (fstat (fd, &st)) {
 			_pam_log(NULL, LOG_ERR, FALSE,

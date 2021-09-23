@@ -191,7 +191,7 @@ check_console_name(pam_handle_t *pamh, const char *consolename, int nonroot_ok, 
     if (!found) {
         /* not found */
         _pam_log(pamh, LOG_INFO, TRUE, "no matching console regex found");
-        return 0;      
+        return 0;
     }
 
     /* add some policy here -- not really the PAM way of doing things, but
@@ -218,7 +218,7 @@ check_console_name(pam_handle_t *pamh, const char *consolename, int nonroot_ok, 
         int l;
         char *dot = NULL;
         char *path = full_path + 1;
-        
+
         full_path[0] = '\0';
         strcpy(path, "/tmp/.X11-unix/X");
         l = sizeof(full_path) - 2 - strlen(path);
@@ -239,7 +239,7 @@ check_console_name(pam_handle_t *pamh, const char *consolename, int nonroot_ok, 
         }
         else if (!on_set) {  /* there is no X11 socket in case of X11 crash */
             _pam_log(pamh, LOG_DEBUG, TRUE, "can't find X11 socket to examine for %s probably due to X crash", consolename);
-            statted = 1; 
+            statted = 1;
         }
     }
 
@@ -561,9 +561,9 @@ pam_sm_open_session(pam_handle_t *pamh, int flags UNUSED,
     }
 
     /* get configuration */
-    if (!configfileparsed) { 
+    if (!configfileparsed) {
         console_parse_handlers(pamh, consolehandlers);
-        configfileparsed = 1; 
+        configfileparsed = 1;
     }
 
     /* return success quietly if not a terminal login */
@@ -582,7 +582,7 @@ pam_sm_open_session(pam_handle_t *pamh, int flags UNUSED,
 	/* errors will be logged and are not critical */
 	console_run_handlers(pamh, TRUE, username, tty);
     }
-    
+
     free(lockfile);
     return ret;
 }
@@ -655,7 +655,7 @@ pam_sm_close_session(pam_handle_t *pamh, int flags UNUSED,
 		if (pam_modutil_read (fd, consoleuser, st.st_size) == -1) {
 		    _pam_log(pamh, LOG_ERR, FALSE,
 			    "\"impossible\" read error on %s", consolelock);
-		    err = PAM_SESSION_ERR; 
+		    err = PAM_SESSION_ERR;
 		    close(fd);
 		    goto decrement;
 		}
