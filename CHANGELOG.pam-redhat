@@ -4,6 +4,11 @@ Changelog of pam-redhat modules
 This changelog describes only changes after branching of pam-redhat modules
 without autoconf support.
 
+1.1.5: Thu Sep 23 2021
+* pam_console: fix covscan issues
+* pam_console: Fix race condition for BUILT_SOURCES on parallel build
+* Makefile: Use xz compression for release tarballs
+
 1.1.4: Wed Nov 11 2020
 * pam_console: update compilation flags
 

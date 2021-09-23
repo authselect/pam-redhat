@@ -1,4 +1,4 @@
-VERSION=1.1.4
+VERSION=1.1.5
 TAG=pam-redhat-$(VERSION)
 
 nothing:
