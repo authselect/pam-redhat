@@ -10,6 +10,6 @@ force-tag:
 	git tag --force $(TAG)
 
 dist:
-	@rm -f $(TAG).tar.bz2 
-	git archive --format=tar --prefix=$(TAG)/ $(TAG) | bzip2 > $(TAG).tar.bz2
-	@echo "The archive is in $(TAG).tar.bz2" 
+	@rm -f $(TAG).tar.xz
+	git archive --format=tar --prefix=$(TAG)/ $(TAG) | xz > $(TAG).tar.xz
+	@echo "The archive is in $(TAG).tar.xz"
