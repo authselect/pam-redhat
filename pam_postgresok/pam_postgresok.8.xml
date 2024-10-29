@@ -1,0 +1,127 @@
+<refentry xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="pam_postgresok">
+
+  <refmeta>
+    <refentrytitle>pam_postgresok</refentrytitle>
+    <manvolnum>8</manvolnum>
+    <refmiscinfo class="source">pam-redhat</refmiscinfo>
+    <refmiscinfo class="manual">pam-redhat Manual</refmiscinfo>
+  </refmeta>
+
+  <refnamediv xml:id="pam_postgresok-name">
+    <refname>pam_postgresok</refname>
+    <refpurpose>PAM module to simple check of real UID and corresponding account name</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis xml:id="pam_postgresok-cmdsynopsis" sepchar=" ">
+      <command>pam_postgresok.so</command>
+      <arg choice="opt" rep="norepeat">
+        debug
+      </arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1 xml:id="pam_postgresok-description">
+
+    <title>DESCRIPTION</title>
+
+    <para>
+      pam_postgresok.so is designed to check that the real UID of the calling
+      process belongs to the "postgres" user and equal to 26 (the value
+      assigned to that user on Red Hat Linux systems).
+    </para>
+  </refsect1>
+
+  <refsect1 xml:id="pam_postgresok-options">
+
+    <title>OPTIONS</title>
+    <variablelist>
+      <varlistentry>
+        <term>
+          debug
+        </term>
+        <listitem>
+          <para>
+            Write debugging messages to syslog.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+
+  <refsect1 xml:id="pam_postgresok-types">
+    <title>MODULE TYPES PROVIDED</title>
+    <para>
+      Only <option>auth</option> module type is provided.
+    </para>
+  </refsect1>
+
+  <refsect1 xml:id="pam_postgresok-return_values">
+    <title>RETURN VALUES</title>
+    <para>
+      <variablelist>
+
+        <varlistentry>
+          <term>PAM_SUCCESS</term>
+          <listitem>
+            <para>
+              Everything was successful.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>PAM_AUTH_ERR</term>
+          <listitem>
+            <para>
+              Authentication failed.
+            </para>
+          </listitem>
+        </varlistentry>
+
+      </variablelist>
+    </para>
+  </refsect1>
+
+  <refsect1 xml:id="pam_postgresok-examples">
+    <title>EXAMPLES</title>
+      <programlisting>
+    auth sufficient pam_postgresok.so
+      </programlisting>
+  </refsect1>
+
+  <refsect1 xml:id="pam_postgresok-files">
+    <title>FILES</title>
+    <variablelist>
+      <varlistentry>
+        <term>/usr/share/doc/setup/uidgid</term>
+        <listitem>
+          <para>Documentation setup file</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+
+  <refsect1 xml:id="pam_postgresok-see_also">
+    <title>SEE ALSO</title>
+    <para>
+      <citerefentry>
+	<refentrytitle>pam_rootok</refentrytitle><manvolnum>8</manvolnum>
+      </citerefentry>,
+      <citerefentry>
+	<refentrytitle>pam.d</refentrytitle><manvolnum>5</manvolnum>
+      </citerefentry>,
+      <citerefentry>
+	<refentrytitle>pam</refentrytitle><manvolnum>8</manvolnum>
+      </citerefentry>
+    </para>
+  </refsect1>
+
+  <refsect1 xml:id="pam_postgresok-author">
+    <title>AUTHOR</title>
+      <para>
+        pam_postgresok was written by Fernando Nasser &lt;fnasser@redhat.com&gt;.
+      </para>
+  </refsect1>
+
+</refentry>

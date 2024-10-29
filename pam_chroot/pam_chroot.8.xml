@@ -1,0 +1,155 @@
+<refentry xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="pam_chroot">
+
+  <refmeta>
+    <refentrytitle>pam_chroot</refentrytitle>
+    <manvolnum>8</manvolnum>
+    <refmiscinfo class="source">pam-redhat</refmiscinfo>
+    <refmiscinfo class="manual">pam-redhat Manual</refmiscinfo>
+  </refmeta>
+
+  <refnamediv xml:id="pam_chroot-name">
+    <refname>pam_chroot</refname>
+    <refpurpose>PAM module that allows a user to be chrooted in session</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis xml:id="pam_chroot-cmdsynopsis" sepchar=" ">
+      <command>pam_chroot.so</command>
+      <arg choice="opt" rep="norepeat">
+        debug
+      </arg>
+      <arg choice="opt" rep="norepeat">
+        onerr
+      </arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1 xml:id="pam_chroot-description">
+
+    <title>DESCRIPTION</title>
+
+    <para>
+      When the calling application attempts to open a session, pam_chroot opens
+      <filename>/etc/security/chroot.conf</filename> and searches for a line of
+      the form: user directory, where the "user" listed is actually a regular
+      expression. If the <emphasis>PAM_USER</emphasis> for whom the session is
+      being opened matches the regular expression, the module will attempt to
+      chroot() to the given directory.
+    </para>
+    <para>
+      The calling application must be executing with root privileges in order
+      to be able to chroot() at all.  If the application needs to exec() other
+      programs (such as a server process or spawning a shell), you will need to
+      duplicate some portions of an actual root environment under the
+      chroot()ed directory in order for it to work at all.  (This includes
+      configuration and logging files.)  If configured incorrectly, this module
+      may potentially render the service unusable and, under some
+      circumstances, pose a security risk.
+    </para>
+    <para>
+      In particular, the new root directory and all of its parent directories
+      must not be writable by anyone but root.
+    </para>
+  </refsect1>
+
+  <refsect1 xml:id="pam_chroot-options">
+
+    <title>OPTIONS</title>
+    <variablelist>
+      <varlistentry>
+        <term>
+          debug
+        </term>
+        <listitem>
+          <para>
+            Log debug messages to syslog.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          onerr=
+        </term>
+        <listitem>
+          <para>
+            Values can be <emphasis>"succeed"</emphasis> or
+            <emphasis>"fail"</emphasis>.  The action to take if the
+            configuration file can not be opened, the chroot() fails, or the
+            user does not match any of the expressions listed in the
+            configuration file.  Default is <emphasis>"succeed"</emphasis>.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+
+  <refsect1 xml:id="pam_chroot-types">
+    <title>MODULE TYPES PROVIDED</title>
+    <para>
+      Only <option>session</option> module type is provided.
+    </para>
+  </refsect1>
+
+  <refsect1 xml:id="pam_chroot-return_values">
+    <title>RETURN VALUES</title>
+    <para>
+      <variablelist>
+
+        <varlistentry>
+          <term>PAM_SUCCESS</term>
+          <listitem>
+            <para>
+              Everything was successful.
+            </para>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term>PAM_SESSION_ERR</term>
+          <listitem>
+            <para>
+	            Session error.
+            </para>
+          </listitem>
+        </varlistentry>
+
+      </variablelist>
+    </para>
+  </refsect1>
+
+  <refsect1 xml:id="pam_chroot-files">
+    <title>FILES</title>
+    <variablelist>
+      <varlistentry>
+        <term>/etc/security/chroot.conf</term>
+        <listitem>
+          <para>Chroot configuration file</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+
+  <refsect1 xml:id="pam_chroot-see_also">
+    <title>SEE ALSO</title>
+    <para>
+      <citerefentry>
+	<refentrytitle>pam.d</refentrytitle><manvolnum>5</manvolnum>
+      </citerefentry>,
+      <citerefentry>
+	<refentrytitle>pam</refentrytitle><manvolnum>8</manvolnum>
+      </citerefentry>
+    </para>
+  </refsect1>
+
+  <refsect1 xml:id="pam_chroot-author">
+    <title>AUTHOR</title>
+      <para>
+        The original pam_chroot was written by Matthew Kirkwood and it was
+        obtained from ftp://ferret.lmh.ox.ac.uk/users/weejock/pam_chroot/.
+      </para>
+      <para>
+        nalin ported this module for Red Hat.
+      </para>
+  </refsect1>
+
+</refentry>
