@@ -4,6 +4,9 @@ Changelog of pam-redhat modules
 This changelog describes only changes after branching of pam-redhat modules
 without autoconf support.
 
+1.3.1: Fri Jan 23 2026
+* build: update meson builds
+
 1.3.0: Tue Oct 29 2024
 * build: update to meson build system
 
