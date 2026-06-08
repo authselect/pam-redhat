@@ -1,6 +1,12 @@
 pam-redhat
 ==========
 
+## Deprecation notice
+
+All PAM modules in this project are deprecated and scheduled for removal.
+
+## Description
+
 PAM modules created and developed primarily for use in Fedora
 and Red Hat Enterprise Linux distributions. Because of their
 limited use they are not included into the upstream Linux PAM
